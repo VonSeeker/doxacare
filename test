@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoxaCare AI - Healthcare Assistant for Sierra Leone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0fdf4;
+    }
+    
+    .typing-indicator::after {
+      content: '...';
+      animation: typing 1.5s infinite;
+    }
+    
+    @keyframes typing {
+      0% { content: '.'; }
+      33% { content: '..'; }
+      66% { content: '...'; }
+    }
+    
+    .translate-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .translate-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .emergency-shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div id="auth-root"></div>
+  <div id="app-content">
+  <header class="bg-gradient-to-r from-green-600 to-yellow-400 shadow-md">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-heartbeat text-white text-2xl"></i>
+        <h1 class="text-white font-bold text-xl md:text-2xl">DoxaCare AI</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="languageToggle" class="bg-white text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center translate-btn">
+          <span id="currentLanguage">Krio</span>
+          <i class="fas fa-exchange-alt ml-1"></i>
+        </button>
+        <button id="emergencyBtn" class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center hover:bg-red-700 emergency-shake">
+          <i class="fas fa-exclamation-triangle mr-1"></i>
+          Emergency
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="bg-white shadow-sm">
+    <div class="container mx-auto px-4">
+      <div class="flex overflow-x-auto">
+        <button class="tab-btn active px-4 py-3 text-green-700 font-medium border-b-2 border-green-700 whitespace-nowrap" data-tab="home">
+          <i class="fas fa-home mr-2"></i>Home
+        </button>
+        <button class="tab-btn px-4 py-3 text-gray-600 font-medium whitespace-nowrap" data-tab="symptoms">
+          <i class="fas fa-notes-medical mr-2"></i>Health Topics
+        </button>
+        <button class="tab-btn px-4 py-3 text-gray-600 font-medium whitespace-nowrap" data-tab="advice">
+          <i class="fas fa-lightbulb mr-2"></i>Health Advice
+        </button>
+        <button class="tab-btn px-4 py-3 text-gray-600 font-medium whitespace-nowrap" data-tab="clinics">
+          <i class="fas fa-hospital mr-2"></i>Find Clinics
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="flex-grow container mx-auto px-4 py-6">
+    <div id="home-tab" class="tab-content active">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <div class="bg-green-100 p-4 border-b border-green-200">
+          <h2 class="text-green-800 font-bold text-lg">Welcome to DoxaCare AI</h2>
+          <p id="welcomeText" class="text-gray-700 text-sm mt-1">Your trusted healthcare assistant for Sierra Leone. Ask about symptoms, get health advice, or find nearby clinics.</p>
+          <p id="welcomeTextKrio" class="text-gray-700 text-sm mt-1 hidden">EvaCare AI wey dey for you pan Salone health. Ask about sick wey you get, take health advice, or find clinic close to you.</p>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h3 class="font-bold text-yellow-800 mb-2 flex items-center">
+                <i class="fas fa-bell text-yellow-600 mr-2"></i>
+                <span id="healthAlertsTitle">Health Alerts</span>
+              </h3>
+              <div class="text-sm text-gray-700">
+                <div id="healthAlertsText">
+                  <p>• Monkeypox outbreak spreading nationwide (May 2025)</p>
+                  <p>• Avoid contact with wild animals</p>
+                  <p>• Isolate if rash/fever develops</p>
+                </div>
+                <div id="healthAlertsTextKrio" class="hidden">
+                  <p>• Monkeypox dey spread for all Salone (May 2025)</p>
+                  <p>• No touch bush meat or wild animal</p>
+                  <p>• Stay for house if you get rash or fever</p>
+                </div>
+              </div>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 class="font-bold text-blue-800 mb-2 flex items-center">
+                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
+                <span id="quickLinksTitle">Quick Chats</span>
+              </h3>
+              <div class="grid grid-cols-2 gap-2">
+                <button class="quick-action-btn bg-green-100 text-green-800" data-action="malaria">
+                  <i class="fas fa-bug mr-1"></i>
+                  <span id="malariaBtnText">Malaria</span>
+                </button>
+                <button class="quick-action-btn bg-yellow-100 text-yellow-800" data-action="pregnancy">
+                  <i class="fas fa-baby mr-1"></i>
+                  <span id="pregnancyBtnText">Pregnancy</span>
+                </button>
+                <button class="quick-action-btn bg-red-100 text-red-800" data-action="diarrhea">
+                  <i class="fas fa-tint mr-1"></i>
+                  <span id="diarrheaBtnText">Diarrhea</span>
+                </button>
+                <button class="quick-action-btn bg-purple-100 text-purple-800" data-action="hypertension">
+                  <i class="fas fa-heartbeat mr-1"></i>
+                  <span id="hypertensionBtnText">Hypertension</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-green-600 p-3">
+          <h2 class="text-white font-bold flex items-center">
+            <i class="fas fa-comments mr-2"></i>
+            <span id="chatTitle">Chat with DoxaCare AI</span>
+          </h2>
+        </div>
+        <div id="chatWindow" class="h-64 overflow-y-auto p-4 bg-gray-50">
+          <div class="chat-message bot-message mb-3">
+            <div class="bg-white p-3 rounded-lg shadow-sm max-w-3/4 inline-block">
+              <p id="welcomeChatText">Hello! How can I assist you with your health today? You can describe symptoms, ask for advice, or find clinics near you.</p>
+              <p id="welcomeChatTextKrio" class="hidden">How you dey? Wetin I fit do for you health today? You fit talk about sick wey you get, ask for advice, or find clinic close to you.</p>
+              <div class="quick-reply-buttons mt-2 flex flex-wrap gap-2">
+                <button class="quick-reply-btn bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">I have fever</button>
+                <button class="quick-reply-btn bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">Mosquito bite advice</button>
+                <button class="quick-reply-btn bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">Find clinic near me</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-3 bg-gray-100 border-t border-gray-200">
+          <div class="flex items-center">
+            <input type="text" id="userInput" placeholder="Type your health question here..." class="flex-grow px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            <button id="sendBtn" class="ml-2 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-yellow-400 to-green-600 p-3">
+          <h2 class="text-white font-bold flex items-center">
+            <i class="fas fa-globe-africa mr-2"></i>
+            <span id="culturalTitle">Cultural Health Tips</span>
+          </h2>
+        </div>
+        <div class="p-4">
+          <div class="flex flex-col md:flex-row items-center">
+            <img src="https://images.app.goo.gl/yodxUkY2sWEmGoMB9" alt="Lumley Beach in Freetown, Sierra Leone" class="w-32 h-32 md:w-48 md:h-48 object-cover rounded-lg shadow mb-4 md:mb-0 md:mr-4">
+            <div>
+              <h3 class="font-semibold text-green-800 mb-2" id="localTipTitle">Local Health Wisdom</h3>
+              <div id="culturalTipText" class="text-gray-700">
+                <p>• Boil water for drinking to prevent waterborne diseases.</p>
+                <p>• Use insecticide-treated nets (ITNs) every night during rainy season.</p>
+                <p>• Sun-dry clothes thoroughly to kill germs.</p>
+              </div>
+              <div id="culturalTipTextKrio" class="text-gray-700 hidden">
+                <p>• Make water hot well-well before you drink am to stop water sickness.</p>
+                <p>• Use net wey get medicine for kill mosquito every night when rain dey fall.</p>
+                <p>• Make sun dry your clothes proper to kill all germ.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="symptoms-tab" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-blue-600 p-3 flex justify-between items-center">
+          <h2 class="text-white font-bold flex items-center">
+            <i class="fas fa-notes-medical mr-2"></i>
+            <span>Health Topics</span>
+          </h2>
+          <button id="refreshHealthTopics" class="text-white hover:text-blue-200 transition-colors" title="Refresh health topics">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+        <div class="p-4">
+          <div id="symptomInputArea" class="mb-4">
+            <label for="symptomsInput" class="block text-gray-700 mb-2">Ask about any health topic:</label>
+            <div class="flex">
+              <input type="text" id="symptomsInput" class="flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g. fever, exercise tips, nutrition advice">
+              <button id="checkSymptomsBtn" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700">Ask</button>
+            </div>
+          </div>
+          <div id="symptomResults" class="hidden border-t pt-4">
+            <h3 class="font-semibold text-gray-800 mb-3">Possible Conditions:</h3>
+            </div>
+          <div class="mt-4 p-3 bg-gray-100 rounded-lg">
+            <h4 class="font-medium text-gray-700 mb-2">Common Health Topics:</h4>
+            <div class="grid grid-cols-2 gap-2">
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="fever,chills,headache,muscle pain">Malaria</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="fever,abdominal pain,constipation,diarrhea">Typhoid</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="watery diarrhea,vomiting,dehydration">Cholera</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="high fever,severe headache,eye pain,muscle pain">Dengue</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="cough,fever,difficulty breathing">Pneumonia</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="fever,headache,stiff neck,sensitivity to light">Meningitis</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="fever,skin rash,conjunctivitis,muscle pain">Lassa Fever</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded text-sm" data-symptoms="fever,cough,loss of taste/smell,difficulty breathing">COVID-19</button>
+            </div>
+          </div>
+          <div class="mt-4 p-3 bg-gray-100 rounded-lg">
+            <h4 class="font-medium text-gray-700 mb-2">Common Symptoms:</h4>
+            <div class="flex flex-wrap gap-2">
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm">Fever</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm">Exercise</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm">Nutrition</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm">Pregnancy</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm">Diabetes</button>
+              <button class="symptom-tag bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm">Mental Health</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="advice-tab" class="tab-content hidden">
+      <div id="community-forum-root"></div>
+    </div>
+    
+    <div id="clinics-tab" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-red-600 p-3">
+          <h2 class="text-white font-bold flex items-center">
+            <i class="fas fa-hospital mr-2"></i>
+            <span>Find Clinics</span>
+          </h2>
+        </div>
+        <div class="p-4">
+          <div class="mb-4">
+            <label for="locationInput" class="block text-gray-700 mb-2">Enter your location (district or city):</label>
+            <div class="flex">
+              <input type="text" id="locationInput" class="flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="e.g. Freetown, Bo, Kenema">
+              <button id="findClinicsBtn" class="bg-red-600 text-white px-4 py-2 rounded-r-lg hover:bg-red-700">Search</button>
+            </div>
+          </div>
+          <div id="clinicResults" class="space-y-4">
+            </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  </div>
+  <script type="module" src="/src/main.tsx"></script> 
+</body>
+</html>
